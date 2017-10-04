@@ -27,7 +27,7 @@ dds_hepg2 <- DESeqDataSetFromMatrix(countData = hepg2,
                               design = ~ status + timepoint + status:timepoint)
 
 ## Many rows have a total count of <= 1. Remove them.
-dds_hepg2 <- dds_hepg2[ rowSums(counts(dds_hepg2)) > 6, ]
+dds_hepg2 <- dds_hepg2[ rowSums(counts(dds_hepg2)) > 1, ]
 
 #### Some prelim metrics ####
 ## Transform the data using the rlog. Blind set to false to ensure that the variables being investigated, status vs cell_line, will not contribute to variance-mean trend of the experiment.
@@ -118,9 +118,11 @@ upreg_hepg2 <- head(res_hepg2[ order(res_hepg2$padj, decreasing = TRUE), ], 30)
 
 
 ##Heatmap
-upreg_top <- head(upreg_hepg2, 20)
-topVarGenes <- head(order(rowVars(assay(rld_hepg2)), decreasing = TRUE), 50)
-mat  <- assay(rld_hepg2)[ topVarGenes, ]
-mat  <- mat - rowMeans(mat)
-anno <- as.data.frame(colData(rld_hepg2)[, c("timepoint","status")])
-pheatmap(mat, annotation_col = anno, main="HepG2 time")
+betas <- coef(dds_hepg2)
+colnames(betas)
+top <- head(order(res_hepg2$padj), 50)
+mat <- betas[top, -c(1,2)]
+thr <- 1
+mat[mat < -thr] <- -thr
+mat[mat > -thr] <- thr
+pheatmap(mat, cluster_col = F)
