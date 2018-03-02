@@ -1,6 +1,6 @@
 library(ggplot2)
 
-virus <- read.table("~/cchf/8_viral_alignment/summary.txt", h = T)
+virus <- read.table("~/cchf/8_viral_alignment/summaries_RK/summary.txt", h = T)
 key <- read.table("~/cchf/ref_files/cchv.key", h = T)
 
 virus <- merge(virus, key[,c(1,2,3,5)], by.x = "Library", by.y = "library")
