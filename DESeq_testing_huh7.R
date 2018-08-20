@@ -33,7 +33,6 @@ str(colData_huh7)
 
 dds_huh7 <- DESeqDataSetFromMatrix(countData = huh7,
                                    colData = colData_huh7,
-                                   design = ~ group)
                                    design = ~ status + timepoint + status:timepoint)
 
 ## Many rows have a total count of <= 1. Remove them.

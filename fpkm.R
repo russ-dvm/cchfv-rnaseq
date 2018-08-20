@@ -40,7 +40,7 @@ huhInf7 <- inner_join(lib16, lib17, by = "transcript", suffix = c(".lib16", ".li
 huhInf7 <- inner_join(huhInf7, lib18, by = "transcript")
 
 #### HUH DAY 1 UNINFECTED ####
-huhUn1_1v2 <- ggplot(huhUn1, aes(x = FPKM.lib1, y = FPKM.lib2)) + geom_point() + stat_cor() + geom_smooth(method = "lm", se = F) + theme_bw() + theme(panel.grid = element_blank()) + xlab("Lib1") + ylab("Lib2")
+huhUn1_1v2 <- ggplot(huhUn1, aes(x = FPKM.lib1, y = FPKM.lib2)) + geom_point() + stat_cor(method = "spearman") + geom_smooth(method = "lm", se = F) + theme_bw() + theme(panel.grid = element_blank()) + xlab("Lib1") + ylab("Lib2")
 huhUn1_1v3 <- ggplot(huhUn1, aes(x = FPKM.lib1, y = FPKM)) + geom_point() + stat_cor() + geom_smooth(method = "lm", se = F) + theme_bw() + theme(panel.grid = element_blank()) + xlab("Lib1") + ylab("Lib3")
 huhUn1_2v3 <- ggplot(huhUn1, aes(x = FPKM.lib2, y = FPKM)) + geom_point() + stat_cor() + geom_smooth(method = "lm", se = F) + theme_bw() + theme(panel.grid = element_blank()) + xlab("Lib2") + ylab("Lib3")
 
