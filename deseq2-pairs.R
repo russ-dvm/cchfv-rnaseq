@@ -185,6 +185,10 @@ pheatmap(matHuhThr, annotation_col = anno_huh, main = "Huh7")
 pheatmap(matHuhSev, annotation_col = anno_huh, main = "Huh7")
 
 ### BY GENE NAME or ENS ID
+
+## mods on 19/02/11 - unified the colours across plots by manually specifying the breaks
+## removed the timepoint column annotation
+
 matList <- list("Hep One" = matHepOne, "Hep Three" = matHepThr, "Hep Sev" = matHepSev, "Huh One" = matHuhOne, "Huh Three" = matHuhThr, "Huh Seven" = matHuhSev)
 
 genify <- function(x, type){
@@ -196,16 +200,22 @@ genify <- function(x, type){
 matListId <- lapply(matList, genify, type = "gene_id")
 matListName <- lapply(matList, genify, type = "gene_name")
 
+## Determine the max/min element of all the plots:
+breaksMax <- max(sapply(matListName, max))
+breaksMin <- min(sapply(matListName, min))
+figBreaks <- seq(breaksMin, breaksMax, by = 0.082)
+
+## anno_hep[1] == remove timepoint
 for (x in grep("Hep", names(matListId))){
-  pheatmap(matListId[[x]], annotation_col = anno_hep, main = names(matListId)[x])
-  pheatmap(matListName[[x]], annotation_col = anno_hep, main = names(matListName)[x])
+  # pheatmap(matListId[[x]], annotation_col = anno_hep, main = names(matListId)[x])
+  pheatmap(matListName[[x]], annotation_col = anno_hep[1], show_colnames = F, legend_breaks = -15:15, legend_labels = -15:15, breaks = figBreaks)
 }
 
 for (x in grep("Huh", names(matListId))){
-  pheatmap(matListId[[x]], annotation_col = anno_huh, main = names(matListId)[x])
-  pheatmap(matListName[[x]], annotation_col = anno_huh, main = names(matListName)[x])
+  # pheatmap(matListId[[x]], annotation_col = anno_huh, main = names(matListId)[x])
+  pheatmap(matListName[[x]], annotation_col = anno_huh[1], show_colnames = F, legend_breaks = -15:15, legend_labels = -15:15, breaks = figBreaks)
 }
-
+##saved as 450x850 EPS
 
 ### PLOT COUNTS ####
 #Source the slightly modified plotCounts function
@@ -263,7 +273,7 @@ ggplot(dfHuhSev, aes(y = count, x = group)) + geom_point(size = 2, aes(colour = 
 ggplot(subset(dfHuhSev, timepoint == 7), aes(y = count, x = group)) + geom_jitter(size = 2, aes(colour = status)) + theme_bw() + facet_wrap(~gene, scales = "free_y") + theme(axis.text.x = element_text(angle = 60, hjust =1)) + ggtitle("Top 12 DE genes, Day 7, Huh7")
 
 #### VOLCANO PLOT ####
-a <- subset(thrHuh, !is.na(padj))
+a <- subset(thrHep, !is.na(padj))
 volc <- data.frame(logFC = a$log2FoldChange, negLogPval = -log10(a$padj))
 maxval <- max(volc$logFC)
 minval <- abs(min(volc$logFC))
@@ -285,12 +295,12 @@ ggplot(volc, aes(x = logFC, y = negLogPval)) +
   theme(legend.position = "none") +
   xlab(expression(log[2]~fold~change)) +
   ylab(expression(-log[10](adjusted~p~value))) +
-  annotate(geom = "text", label = nrow(subset(volc, sig == T & logFC >= lfc)), y = max(volc$negLogPval), x = lim/2) +
-  annotate(geom = "text", label = nrow(subset(volc, sig == T & logFC <= -lfc)), y = max(volc$negLogPval), x = -lim/2) +
-  annotate(geom = "text", label = nrow(subset(volc, sig == F)) - sum(is.na(volc$negLogPval)), y = max(volc$negLogPval), x = 0) +
-  annotate(geom = "text", label = paste("p = ", pval), colour = "red", x = -lim, y = pval, hjust = 0, vjust = -1) +
-  annotate(geom = "text", label = lfc, colour = "blue", x = lfc + 0.1, y = 0, hjust = "left", vjust = "top") +
-  annotate(geom = "text", label = -lfc, colour = "blue", x = -lfc - 0.1, y = 0, hjust = "right", vjust = "top")
+  annotate(geom = "text", label = paste("n =", nrow(subset(volc, sig == T & logFC >= lfc))), y = max(volc$negLogPval), x = lim/2) +
+  annotate(geom = "text", label = paste("n =", nrow(subset(volc, sig == T & logFC <= -lfc))), y = max(volc$negLogPval), x = -lim/2) +
+  # annotate(geom = "text", label = nrow(subset(volc, sig == F)) - sum(is.na(volc$negLogPval)), y = max(volc$negLogPval), x = 0) +
+  annotate(geom = "text", label = paste("p = ", pval), colour = "red", x = lim-4, y = pval+1.2, hjust = 0, vjust = -1) +
+  annotate(geom = "text", label = lfc, colour = "blue", x = lfc + 0.1, y = -0.5, hjust = "left", vjust = "top") +
+  annotate(geom = "text", label = -lfc, colour = "blue", x = -lfc - 0.1, y = -0.5, hjust = "right", vjust = "top")
 
 
 
